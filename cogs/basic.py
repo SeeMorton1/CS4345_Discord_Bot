@@ -2,6 +2,7 @@ import discord as d
 from discord import channel
 import discord
 from discord import guild
+from discord import client
 from discord.ext import commands
 from datetime import datetime, timedelta
 from discord import Embed
@@ -69,15 +70,21 @@ class basic(commands.Cog):
             role = await guild.create_role(name = class_name,colour=discord.Colour(0xff0000))
             authour = ctx.message.author
             await authour.add_roles(role)
-            message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
-            await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
             newChannel = await guild.create_text_channel(name = '{}'.format(class_name),)
             member = guild.default_role
             await newChannel.set_permissions(member, view_channel = False)
             await newChannel.set_permissions(role, view_channel = True, send_messages=True)
-    def on_reaction_add(reaction, user, role):
-            if reaction =='\N{WHITE HEAVY CHECK MARK}' :
-                user.add_roles(role)
+            message = await ctx.send(f'Class `{class_name}` has been created! \nReact below to join.')
+            reaction = await message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
+            user = set()
+            await message.on_reaction_add(reaction, user, role)
+                
+            
+    async def on_reaction_add(reaction, user, role):
+        if reaction.emoji == '\N{WHITE HEAVY CHECK MARK}':
+            roleS = discord.utils.get(reaction.message.guild.roles, name = role)
+            if roleS not in user.roles:
+                user.add_roles(roleS)
     @commands.command(name="getUsersInClass")  # Return all users that are in this class
     async def getUsersInClass(self,ctx, class_id):
         await ctx.send("Users in class {}: ".format(self.test.users_in_class(class_id)))
