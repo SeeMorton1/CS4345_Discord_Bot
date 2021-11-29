@@ -28,7 +28,7 @@ After that, the bot should run.
 * !meeting Test(title) 2021-11-30-16:40 2021-11-30-17:20  zoom(location) meeting test
 * !dm @Zihao Lin Hello 
 * !addClass swe4345
-* !join
+* !join swe4345
 * !leave swe4345
 * !deleteClass swe4345
 
