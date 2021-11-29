@@ -14,20 +14,26 @@ class UserActivity(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.test = database_func.getInstance()
+        #     get database singleton instance
         self.playtime = {}
 
     @commands.Cog.listener()
     async def on_ready(self):
         print("READy")
         self.collect_play_time.start()
+        # collecting users playtime
         self.show_play_time.start()
+        # display playtime daily
         self.warn_play_time.start()
+        # warn users for overplay
         self.change_warned_status.start()
+        # change warning status daily
         self.clear_playtime.start()
+    #     cleay previous day actvity
 
     @commands.command()
     async def change_playtime(self, ctx, time:float):
-
+        # update playtme
         await ctx.send(ctx.author.name + " has updated his playtime limit to " + str(time)+" hours" )
         time = time * 3600
         # convert hours to seconds
@@ -36,6 +42,7 @@ class UserActivity(commands.Cog):
 
     @commands.command()
     async def status(self, ctx, member: discord.Member):
+        # get someone status
         # https://discordpy.readthedocs.io/en/stable/intents.html
         # https://stackoverflow.com/questions/67149879/how-to-get-user-activity-in-discord-py
         if member.activity is None:
@@ -69,6 +76,7 @@ class UserActivity(commands.Cog):
 
     @commands.command()
     async def status_self(self, ctx):
+        # get self play time
         msg = ctx.author.name + "\n"
         results_list = self.test.get_user_activities(ctx.author.id)
         # list of tuples where [0] is activity and [1] is time

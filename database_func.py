@@ -19,6 +19,7 @@ class database_func:
 
 
     def __init__(self):
+        # establish database conection
         if database_func.__instance is None:
             load_dotenv()
             connection_config_dict = {
@@ -48,12 +49,14 @@ class database_func:
         print("Inserted successfully")
 
     def add_class(self, class_name:str, channel_id:int, role_id:int, user_id:int):
+        # insert a class
         insert_stmt = "insert into Classes (channel_id, class_name, role_id, user_id)""Values (%s,%s,%s,%s)"
         data = (channel_id,class_name,role_id,user_id)
         self.cursor.execute(insert_stmt, data)
         self.connection.commit()
 
     def add_enrollment(self, user_id, class_id):
+        # add user enrollment to a class
         insert_stmt = "insert into Enrollments (user_id, class_id, date_enrolled)""Values (%s, %s, NOW())"
         data = (user_id, class_id)
         self.cursor.execute(insert_stmt, data)
@@ -81,8 +84,17 @@ class database_func:
         self.cursor.execute(select_stmt, data)
         results = self.cursor.fetchall()
         return results
+
+    def update_task_deadline(self, user_id, taskname, new_deadline):
+        # change task dealdine
+        update_stmt = "update Tasks set deadline = %s where task_name = %s and user_id =%s;"
+        data = (new_deadline, taskname, user_id)
+        self.cursor.execute(update_stmt, data)
+        self.connection.commit()
+        print("update %s successfully" % taskname)
         
     def delete_user(self, userid):
+        # delete a user
         delete_stmt = "delete from Users where user_id = %s"
         data = (userid,)
         self.cursor.execute(delete_stmt, data)
@@ -90,6 +102,7 @@ class database_func:
         print("delete successfully")
 
     def delete_class(self, class_name):
+        # delete a class
         delete_stmt = "delete from Classes where class_name = %s"
         data = (class_name,)
         self.cursor.execute(delete_stmt, data)
@@ -97,6 +110,7 @@ class database_func:
         print("delete %s successfully" % class_name)
 
     def delete_task(self,task_name):
+        # delete a task
         delete_stmt = "delete from Tasks where task_name = %s"
         data = (task_name)
         self.cursor.execute(delete_stmt, data)
@@ -104,6 +118,7 @@ class database_func:
         print("delete %s successfully" % task_name)
     
     def delete_expired_tasks(self):
+        # delete all expired tasks
         delete_stmt = "delete from Tasks where deadline < NOW()"
         self.cursor.execute(delete_stmt)
         self.connection.commit()
@@ -130,6 +145,7 @@ class database_func:
             print(x)
 
     def update_user(self,name,server,time_zone):
+        # update user info
         update_stmt = "update Users set username = %s , servers = %s, time_zone = %s where username = %s;"
         data = (name,server,time_zone)
         self.cursor.execute(update_stmt, data)
@@ -137,6 +153,7 @@ class database_func:
         print("update %s successfully" % name)
 
     def update_class(self,classname,server):
+        # update class info
         update_stmt = "update Classes set class_name = %s, servers = %s where class_name =%s"
         data = (classname,server)
         self.cursor.execute(update_stmt, data)
@@ -150,6 +167,7 @@ class database_func:
         print("clear activity successfully")
 
     def add_activity(self, userid, activity):
+        # add user activity
         insert_stmt = "insert into Activities (user_id,activity)""Values (%s,%s)"
         data = [userid, activity]
         self.cursor.execute(insert_stmt, data)
@@ -157,6 +175,7 @@ class database_func:
         print("Inserted " + activity + " successfully")
 
     def update_activity(self,userid,activity):
+        # update user activity
         update_stmt = "update Activities set time = time+10 where user_id =%s and activity =%s"
         data = (userid,activity)
         self.cursor.execute(update_stmt, data)
@@ -174,6 +193,7 @@ class database_func:
             return True
 
     def get_user_activities(self,userid):
+        # return all users activity
         select_stmt = "SELECT activity, time from Activities where user_id = %s"
         data = (userid, )
         self.cursor.execute(select_stmt, data)
@@ -182,6 +202,7 @@ class database_func:
     # here we return list of tuples
 
     def sum_user_activities(self,userid):
+        # sum their activity
         select_stmt = "select sum(time) from Activities where user_id = %s and activity not like %s"
         data = (userid,"%custom%" )
         self.cursor.execute(select_stmt, data)
@@ -191,6 +212,7 @@ class database_func:
         return result
 
     def get_playtime_limit_and_warning(self,userid):
+        # prepare to warn user
         select_stmt = "SELECT playtime_limit, is_warned from Users where user_id =%s"
         data = (userid, )
         self.cursor.execute(select_stmt, data)
@@ -198,6 +220,7 @@ class database_func:
         return result
     # return a tuple where [0] is limit and [1] is warned or not
     def is_warned(self,userid):
+        # make them warned to prevent spamming
         update_stmt = "update Users set is_warned =1 where user_id =%s"
         data = (userid,)
         self.cursor.execute(update_stmt, data)
@@ -206,6 +229,7 @@ class database_func:
     #     the user is warned
 
     def change_warned(self,userid):
+        # change warning status daily
         update_stmt = "update Users set is_warned =0 where user_id =%s"
         data = (userid,)
         self.cursor.execute(update_stmt, data)
@@ -213,6 +237,7 @@ class database_func:
         print("update successfully")
     #     change warning status
     def change_play_time_limit(self, userid, time):
+        # update playtime limit
         update_stmt = "update Users set playtime_limit =%s where user_id =%s"
         data = (time, userid)
         self.cursor.execute(update_stmt, data)
@@ -222,6 +247,7 @@ class database_func:
 
 
     def add_reminder(self,reminder_id, channel_id, user_id, reminder_time, title, description):
+        # create a reminder
         insert_stmt = "insert into Reminders (reminder_id, channel_id, user_id, reminder_time, reminder_title,reminder_description)""Values (%s,%s,%s,%s,%s,%s)"
         data = [reminder_id , channel_id , user_id , reminder_time , title, description]
         self.cursor.execute(insert_stmt,data)
@@ -229,6 +255,7 @@ class database_func:
         print("Inserted reminder successfully")
 
     def get_reminders(self):
+        # get pending reminders
         select_stmt = "select channel_id, reminder_title, reminder_description from Reminders where reminder_time BETWEEN %s AND %s"
         now_time = datetime.datetime.now(timezone('America/Chicago'))
         past_time = now_time - datetime.timedelta(minutes=1)
@@ -241,6 +268,7 @@ class database_func:
     #     return lists of approached reminders
 
     def add_meeting(self, meeting_id, channel_id, title, begin, end, location, description, creator):
+        # create a meeting
         insert_stmt = "insert into Meetings ""Values (%s,%s,%s,%s,%s,%s,%s,%s)"
         data = [meeting_id, channel_id, title, begin, end, location, description, creator]
         self.cursor.execute(insert_stmt,data)
@@ -248,6 +276,7 @@ class database_func:
         print("Inserted meeting successfully")
 
     def get_meetings(self):
+        # get meetings arrived
         select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time,location, description  from Meetings where begin_time BETWEEN %s AND %s"
         now_time = datetime.datetime.now(timezone('America/Chicago'))
         past_time = now_time - datetime.timedelta(minutes=1)
@@ -259,6 +288,7 @@ class database_func:
         return results
 
     def get_meetings_within_10minutes(self):
+        # get meetings within 10 minutes
         select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time, location from Meetings where begin_time BETWEEN %s AND %s"
         now_time = datetime.datetime.now(timezone('America/Chicago'))
         future_time = now_time + datetime.timedelta(minutes=10)
@@ -270,6 +300,7 @@ class database_func:
         return results
 
     def add_participant_to_meetings(self, user_id,meeting_id):
+        # add users to participation table
         insert_stmt = "insert into Participation (user_id, meeting_id) ""Values (%s,%s)"
         data = [user_id,meeting_id]
         self.cursor.execute(insert_stmt,data)

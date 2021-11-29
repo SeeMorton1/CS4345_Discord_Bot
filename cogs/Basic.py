@@ -9,12 +9,14 @@ from datetime import datetime
 import asyncio
 import math
 
-
+# this file is responsible for basic functionalities like announcements, polls, and reminders
 class basic(commands.Cog):
     # this file store basic commands
     def __init__(self, bot):
         self.bot = bot
         self.test = database_func.getInstance()
+        #     get database singleton instance
+
         self.check_reminders.start()
 
     @commands.Cog.listener()
@@ -23,21 +25,25 @@ class basic(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
+        # add all users to database on joining a new server
         for member in guild.members:
             if not member.bot:
                 self.test.add_user(member.id, member.name)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        # add new users to database
         if not member.bot:
             self.test.add_user(member.id, member.name)
 
     @commands.Cog.listener()
     async def on_member_leave(self,member):
+        # delete left users
         self.test.delete_user(member.id)
 
     @commands.command()
     async def dm(self, ctx, user: discord.Member, *message):
+        # dm someone
         msg = " ".join(message)
         embed = discord.Embed(title=msg)
         await user.send(embed=embed)
@@ -84,12 +90,10 @@ class basic(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         await ctx.send(ctx.message.author.display_name + " test")
-        # await ctx.send(ctx.author.id)
-
-
 
     @commands.command()
     async def announcement(self, ctx, title, *description):
+        # create an announcement
         msg = ' '.join(description)
         embed = Embed(title=title,
                       description=msg,
@@ -102,7 +106,7 @@ class basic(commands.Cog):
 
     @announcement.error
     async def announcement_error(self, ctx: commands.Context, error: commands.CommandError):
-        # reminder error handling
+        # announcement  error handling
         if isinstance(error, commands.CommandOnCooldown):
             message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
         elif isinstance(error, commands.MissingPermissions):
@@ -118,7 +122,7 @@ class basic(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-
+        # get latency
         latency = ctx.bot.latency
         # Latency is returned in milliseconds
         latency = latency * 1000
