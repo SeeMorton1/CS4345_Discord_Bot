@@ -327,7 +327,7 @@ class Classes(commands.Cog):
 
     # uses database_func get_tasks_all based on user_id and days both are parameters. Gets all tasks for a user in the last x days
     @commands.command()
-    async def taskall(self, ctx, days):
+    async def tasksall(self, ctx, days):
         results = self.test.get_tasks_user_all(ctx.message.author.id, days)
         if len(results) > 0:
 
