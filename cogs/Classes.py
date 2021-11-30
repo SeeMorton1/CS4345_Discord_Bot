@@ -347,6 +347,21 @@ class Classes(commands.Cog):
         else:
             await ctx.send("No tasks currently. Have fun!")
 
+    @tasksall.error
+    async def tasksall_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+        await ctx.send(message, delete_after=10)
+
     # uses database_func get_tasks_channel_specific based on user_id and days both are parameters. Gets all tasks for a user in the last x days in a specific channel
     @commands.command()
     async def tasks(self, ctx, days):
@@ -368,6 +383,20 @@ class Classes(commands.Cog):
         else:
             await ctx.send("No tasks currently for this class. Check your tasks with other classes")
 
+    @tasks.error
+    async def tasks_error(self, ctx: commands.Context, error: commands.CommandError):
+        # reminder error handling
+        if isinstance(error, commands.CommandOnCooldown):
+            message = f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds."
+        elif isinstance(error, commands.MissingPermissions):
+            message = "You are missing the required permissions to run this command!"
+        elif isinstance(error, commands.MissingRequiredArgument):
+            message = f"Missing a required argument: {error.param}"
+        elif isinstance(error, commands.ConversionError):
+            message = str(error)
+        else:
+            message = "Oh no! Something went wrong while running the command!"
+        await ctx.send(message, delete_after=10)
 
 def setup(bot):
     bot.add_cog(Classes(bot))
