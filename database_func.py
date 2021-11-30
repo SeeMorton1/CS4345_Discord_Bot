@@ -291,7 +291,8 @@ class database_func:
         # get meetings within 10 minutes
         select_stmt = "select meeting_id, channel_id, meeting_title, begin_time, end_time, location from Meetings where begin_time BETWEEN %s AND %s"
         now_time = datetime.datetime.now(timezone('America/Chicago'))
-        future_time = now_time + datetime.timedelta(minutes=10)
+        time_change = datetime.timedelta(minutes=10)
+        future_time = now_time + time_change
         now = now_time.strftime('%Y-%m-%d-%H:%M:%S')
         future = future_time.strftime('%Y-%m-%d-%H:%M:%S')
         data = (now, future)

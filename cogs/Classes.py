@@ -107,7 +107,7 @@ class Classes(commands.Cog):
                 embed.add_field(name="Location ", value=location, inline=False)
                 await channel.send(embed=embed)
 
-    @tasks.loop(minutes=6)
+    @tasks.loop(minutes=2)
     async def add_members_to_meetings(self):
         meetings = self.test.get_meetings_within_10minutes()
         if meetings is None:
@@ -308,7 +308,7 @@ class Classes(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def remove_expired_tasks(self):
-        self.test.remove_expired_tasks()
+        self.test.delete_expired_tasks()
 
     @delete_task.error
     async def delete_task_error(self, ctx: commands.context, error: commands.CommandError):
