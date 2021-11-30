@@ -112,7 +112,7 @@ class database_func:
     def delete_task(self,task_name):
         # delete a task
         delete_stmt = "delete from Tasks where task_name = %s"
-        data = (task_name)
+        data = (task_name,)
         self.cursor.execute(delete_stmt, data)
         self.connection.commit()
         print("delete %s successfully" % task_name)
